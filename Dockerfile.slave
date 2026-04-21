@@ -1,0 +1,27 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+    openssh-server \
+    apache2 \
+    python3 \
+    sudo && \
+    mkdir /var/run/sshd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash devops && \
+    echo "devops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+RUN mkdir -p /home/devops/.ssh && \
+    chown -R devops:devops /home/devops/.ssh && \
+    chmod 700 /home/devops/.ssh
+
+COPY start-slave.sh /start-slave.sh
+RUN chmod +x /start-slave.sh
+
+EXPOSE 22 80
+
+CMD ["/start-slave.sh"]

@@ -1,0 +1,41 @@
+services:
+  controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.controller
+    container_name: controller
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./:/workspace
+    networks:
+      - cicdnet
+
+  slave1:
+    build:
+      context: .
+      dockerfile: Dockerfile.slave
+    container_name: slave1
+    networks:
+      - cicdnet
+    ports:
+      - "8081:80"
+
+  slave2:
+    build:
+      context: .
+      dockerfile: Dockerfile.slave
+    container_name: slave2
+    networks:
+      - cicdnet
+    ports:
+      - "8082:80"
+
+volumes:
+  jenkins_home:
+
+networks:
+  cicdnet:
+    driver: bridge
