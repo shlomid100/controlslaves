@@ -1,41 +1,33 @@
 services:
   controller:
-    build:
-      context: .
-      dockerfile: Dockerfile.controller
+    build: ./controller
     container_name: controller
-    ports:
-      - "8080:8080"
-      - "50000:50000"
+    hostname: controller
     volumes:
-      - jenkins_home:/var/jenkins_home
-      - ./:/workspace
+      - ./shared-ssh:/shared
+      - ./ansible:/ansible
+      - ./controller/ssh:/root/.ssh
     networks:
-      - cicdnet
+      - ansible-net
 
   slave1:
-    build:
-      context: .
-      dockerfile: Dockerfile.slave
+    build: ./slave
     container_name: slave1
+    hostname: slave1
+    volumes:
+      - ./shared-ssh:/shared
     networks:
-      - cicdnet
-    ports:
-      - "8081:80"
+      - ansible-net
 
   slave2:
-    build:
-      context: .
-      dockerfile: Dockerfile.slave
+    build: ./slave
     container_name: slave2
+    hostname: slave2
+    volumes:
+      - ./shared-ssh:/shared
     networks:
-      - cicdnet
-    ports:
-      - "8082:80"
-
-volumes:
-  jenkins_home:
+      - ansible-net
 
 networks:
-  cicdnet:
-    driver: bridge
+  ansible-net:
+    driver: bridgie
